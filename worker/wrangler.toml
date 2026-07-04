@@ -1,0 +1,20 @@
+name = "brollopsfoto"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+# Mappen i din OneDrive där bilderna hamnar (skapas automatiskt)
+FOLDER_NAME = "Bröllopsbilder 2026"
+# Vilken webbadress som får ladda upp. "*" = alla (enklast).
+# Vill du låsa ner: sätt t.ex. "https://dittkonto.github.io"
+ALLOWED_ORIGIN = "*"
+
+# Fyll i id:t du får av kommandot:  wrangler kv namespace create TOKENS
+[[kv_namespaces]]
+binding = "TOKENS"
+id = "FYLL_I_HAR"
+
+# Hemligheter sätts med:  wrangler secret put <NAMN>
+#   MS_CLIENT_ID      – Application (client) ID från Azure-appen
+#   MS_CLIENT_SECRET  – klienthemligheten från Azure-appen
+#   UPLOAD_KEY        – ett eget påhittat lösenord, samma som PHOTO_UPLOAD_KEY i index.html

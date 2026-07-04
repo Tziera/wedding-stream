@@ -464,6 +464,136 @@
       letter-spacing: 0.8rem;
     }
 
+    /* ── Photo section ─────────────────────────── */
+    .photo-section {
+      display: none;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1.5rem 1rem;
+      animation: fadeIn 1.4s ease 0.4s both;
+    }
+
+    .photo-card {
+      background: white;
+      border: 1px solid var(--sage-pale);
+      border-radius: 6px;
+      padding: 1.75rem 1.5rem;
+      box-shadow: 0 10px 30px rgba(45,61,50,0.08);
+    }
+
+    .photo-intro {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--text-light);
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .photo-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .photo-btn {
+      flex: 1;
+      padding: 1rem 0.8rem;
+      background: var(--sage-dark);
+      color: var(--cream);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 300;
+      letter-spacing: 0.15rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.15s;
+    }
+
+    .photo-btn:hover  { background: var(--sage); }
+    .photo-btn:active { transform: scale(0.98); }
+
+    .photo-btn-alt { background: var(--gold); }
+    .photo-btn-alt:hover { background: #c9b28c; }
+
+    .photo-queue { list-style: none; margin-top: 0.5rem; }
+
+    .photo-queue li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--cream-dark);
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .photo-thumb {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+      background: var(--cream-dark);
+    }
+
+    .photo-meta { flex: 1; min-width: 0; }
+
+    .photo-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.75rem;
+    }
+
+    .photo-bar {
+      height: 3px;
+      background: var(--cream-dark);
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .photo-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--sage);
+      transition: width 0.2s;
+    }
+
+    .photo-status {
+      font-size: 0.7rem;
+      letter-spacing: 0.05rem;
+      white-space: nowrap;
+    }
+
+    .photo-status.ok  { color: var(--sage-dark); }
+    .photo-status.err { color: var(--red); }
+
+    .photo-retry {
+      background: none;
+      border: 1px solid var(--red);
+      color: var(--red);
+      border-radius: 4px;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+    }
+
+    .photo-count {
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.15rem;
+      text-transform: uppercase;
+      color: var(--sage-dark);
+      margin-top: 0.9rem;
+      min-height: 1em;
+    }
+
     /* ── Message section ───────────────────────── */
     .message-section {
       max-width: 600px;
@@ -530,7 +660,7 @@
         <div class="divider-flower">❀</div>
         <div class="divider-line"></div>
       </div>
-      <div class="lock-label">Ange lösenord för att se livesändningen</div>
+      <div class="lock-label">Ange lösenord för att öppna sidan</div>
       <div class="lock-input-wrap">
         <input class="lock-input" type="password" id="password-input"
           placeholder="lösenord" autocomplete="off"/>
@@ -609,6 +739,46 @@
 
     <div class="floral-divider">❀ ✦ ❀</div>
 
+    <!-- Photo section (visas när uppladdning är konfigurerad, se CONFIG) -->
+    <div class="photo-section" id="photo-section">
+      <div class="stream-label">❀ &nbsp; Festbilder &nbsp; ❀</div>
+      <div class="photo-card">
+
+        <div id="photo-uploader" style="display:none">
+          <p class="photo-intro">
+            Hjälp oss samla minnen från festen! Ta en bild eller välj ur
+            galleriet — bilderna sparas direkt i vårt gemensamma album.
+          </p>
+          <input class="admin-input" type="text" id="guest-name"
+            placeholder="Ditt namn (frivilligt)" maxlength="40" autocomplete="off"/>
+          <div class="photo-buttons">
+            <button class="photo-btn" onclick="document.getElementById('camera-input').click()">
+              📷 Ta en bild
+            </button>
+            <button class="photo-btn photo-btn-alt" onclick="document.getElementById('gallery-input').click()">
+              🖼 Välj bilder
+            </button>
+          </div>
+          <input type="file" id="camera-input" accept="image/*" capture="environment" hidden/>
+          <input type="file" id="gallery-input" accept="image/*" multiple hidden/>
+          <ul class="photo-queue" id="photo-queue"></ul>
+          <div class="photo-count" id="photo-count"></div>
+        </div>
+
+        <div id="photo-fallback" style="display:none; text-align:center">
+          <p class="photo-intro">
+            Hjälp oss samla minnen från festen! Ladda upp dina bilder
+            till vårt gemensamma album.
+          </p>
+          <a id="photo-fallback-link" class="photo-btn"
+             style="display:inline-block; text-decoration:none; padding-left:2rem; padding-right:2rem"
+             target="_blank" rel="noopener">Ladda upp bilder ❀</a>
+        </div>
+
+      </div>
+      <div class="floral-divider">❀ ✦ ❀</div>
+    </div>
+
     <div class="message-section">
       <p>
         Vi är så glada att ni kan följa denna dag med oss,<br/>
@@ -630,6 +800,22 @@
 
     const AGORA_APP_ID  = "aaedf3f9538d4a5f91267c247ccad9ae";
     const AGORA_CHANNEL = "brollop2026";
+
+    // ── Festbilder → OneDrive ────────────────────
+    // Se INSTRUKTIONER-FOTON.md för hur du sätter upp detta (gratis, ~15 min).
+    //
+    // PHOTO_UPLOAD_URL : adressen till din Cloudflare Worker,
+    //                    t.ex. "https://brollopsfoto.dittkonto.workers.dev"
+    // PHOTO_UPLOAD_KEY : samma värde som du valde för UPLOAD_KEY i workern
+    //
+    // ONEDRIVE_FALLBACK_URL : (reservplan, om du inte vill sätta upp workern)
+    //   en OneDrive-delningslänk till en mapp med redigeringsrätt.
+    //   Används bara om PHOTO_UPLOAD_URL är tom.
+    //
+    // Om alla tre är tomma visas inte fotosektionen alls.
+    const PHOTO_UPLOAD_URL      = "";
+    const PHOTO_UPLOAD_KEY      = "";
+    const ONEDRIVE_FALLBACK_URL = "";
     // =============================================
 
     let isAdmin      = false;
@@ -666,6 +852,7 @@
       setTimeout(() => {
         lock.style.display = 'none';
         document.getElementById('main-page').style.display = 'block';
+        initPhotoSection();
         if (isAdmin) {
           document.getElementById('admin-panel').style.display = 'block';
           // Admin joins when they click Start, not immediately
@@ -834,10 +1021,184 @@
       return 'Fel: ' + (e?.message || e?.code || JSON.stringify(e));
     }
 
+    // ── Festbilder ────────────────────────────────
+    const uploadQueue = [];
+    let uploading     = false;
+    let uploadedCount = 0;
+
+    function initPhotoSection() {
+      const section = document.getElementById('photo-section');
+      if (PHOTO_UPLOAD_URL) {
+        section.style.display = 'block';
+        document.getElementById('photo-uploader').style.display = 'block';
+        const saved = localStorage.getItem('guestName');
+        if (saved) document.getElementById('guest-name').value = saved;
+      } else if (ONEDRIVE_FALLBACK_URL) {
+        section.style.display = 'block';
+        document.getElementById('photo-fallback').style.display = 'block';
+        document.getElementById('photo-fallback-link').href = ONEDRIVE_FALLBACK_URL;
+      }
+    }
+
+    function handleFiles(fileList) {
+      for (const file of fileList) {
+        const item = {
+          file,
+          id: 'p' + Date.now() + Math.random().toString(36).slice(2, 7),
+          status: 'väntar'
+        };
+        uploadQueue.push(item);
+        renderQueueItem(item);
+      }
+      processQueue();
+    }
+
+    function renderQueueItem(item) {
+      const li = document.createElement('li');
+      li.id = item.id;
+      const url = URL.createObjectURL(item.file);
+      li.innerHTML =
+        '<img class="photo-thumb" alt=""/>' +
+        '<div class="photo-meta">' +
+          '<div class="photo-name"></div>' +
+          '<div class="photo-bar"><div class="photo-bar-fill"></div></div>' +
+        '</div>' +
+        '<span class="photo-status">Väntar…</span>';
+      const img = li.querySelector('.photo-thumb');
+      img.onload = () => URL.revokeObjectURL(url);
+      img.src = url;
+      li.querySelector('.photo-name').textContent = item.file.name || 'foto.jpg';
+      document.getElementById('photo-queue').appendChild(li);
+    }
+
+    function updateQueueItem(item) {
+      const li = document.getElementById(item.id);
+      if (!li) return;
+      const status = li.querySelector('.photo-status');
+      const oldRetry = li.querySelector('.photo-retry');
+      if (oldRetry) oldRetry.remove();
+      status.classList.remove('ok', 'err');
+
+      if (item.status === 'väntar') {
+        status.textContent = 'Väntar…';
+      } else if (item.status === 'skickar') {
+        status.textContent = 'Skickar…';
+      } else if (item.status === 'klar') {
+        status.textContent = 'Klart ✓';
+        status.classList.add('ok');
+        setItemProgress(item, 1);
+      } else if (item.status === 'fel') {
+        status.textContent = 'Fel ✗';
+        status.classList.add('err');
+        status.title = item.error || '';
+        const btn = document.createElement('button');
+        btn.className = 'photo-retry';
+        btn.textContent = 'Försök igen';
+        btn.onclick = () => {
+          item.status = 'väntar';
+          setItemProgress(item, 0);
+          updateQueueItem(item);
+          processQueue();
+        };
+        li.appendChild(btn);
+      }
+    }
+
+    function setItemProgress(item, frac) {
+      const li = document.getElementById(item.id);
+      if (li) li.querySelector('.photo-bar-fill').style.width = Math.round(frac * 100) + '%';
+    }
+
+    async function processQueue() {
+      if (uploading) return;
+      const item = uploadQueue.find(i => i.status === 'väntar');
+      if (!item) return;
+      uploading = true;
+      item.status = 'skickar';
+      updateQueueItem(item);
+
+      try {
+        const blob = await preparePhoto(item.file);
+        await uploadBlob(item, blob);
+        item.status = 'klar';
+        uploadedCount++;
+        document.getElementById('photo-count').textContent =
+          uploadedCount + (uploadedCount === 1 ? ' bild uppladdad ❀' : ' bilder uppladdade ❀');
+      } catch (e) {
+        item.status = 'fel';
+        item.error = e && e.message ? e.message : 'Okänt fel';
+        console.error(e);
+      }
+
+      updateQueueItem(item);
+      uploading = false;
+      processQueue();
+    }
+
+    // Krymper stora bilder innan uppladdning (snällare mot fest-WiFi).
+    // Om något går snett skickas originalet i stället.
+    async function preparePhoto(file) {
+      if (!/^image\//.test(file.type) || file.size <= 3 * 1024 * 1024) return file;
+      try {
+        const bmp = await createImageBitmap(file);
+        const max = 3000;
+        const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(bmp.width * scale);
+        canvas.height = Math.round(bmp.height * scale);
+        canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+        bmp.close();
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+        if (blob && blob.size < file.size) {
+          const name = (file.name || 'foto').replace(/\.[^.]+$/, '') + '.jpg';
+          return new File([blob], name, { type: 'image/jpeg' });
+        }
+      } catch (e) { /* skicka originalet */ }
+      return file;
+    }
+
+    function uploadBlob(item, blob) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', PHOTO_UPLOAD_URL.replace(/\/+$/, '') + '/upload');
+        xhr.setRequestHeader('X-Upload-Key', PHOTO_UPLOAD_KEY);
+        xhr.setRequestHeader('X-File-Name',
+          encodeURIComponent(blob.name || item.file.name || 'foto.jpg'));
+        const guest = document.getElementById('guest-name').value.trim();
+        if (guest) {
+          localStorage.setItem('guestName', guest);
+          xhr.setRequestHeader('X-Guest-Name', encodeURIComponent(guest));
+        }
+        xhr.setRequestHeader('Content-Type', blob.type || 'application/octet-stream');
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable) setItemProgress(item, e.loaded / e.total);
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            let msg = 'Uppladdningen misslyckades (' + xhr.status + ')';
+            try { msg = JSON.parse(xhr.responseText).error || msg; } catch (_) {}
+            reject(new Error(msg));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Nätverksfel — kontrollera uppkopplingen'));
+        xhr.send(blob);
+      });
+    }
+
     // ── Enter-tangent på lösenordsfält ────────────
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('password-input').addEventListener('keydown', e => {
         if (e.key === 'Enter') checkPassword();
+      });
+      document.getElementById('camera-input').addEventListener('change', e => {
+        if (e.target.files.length) handleFiles(e.target.files);
+        e.target.value = '';
+      });
+      document.getElementById('gallery-input').addEventListener('change', e => {
+        if (e.target.files.length) handleFiles(e.target.files);
+        e.target.value = '';
       });
     });
   </script>
