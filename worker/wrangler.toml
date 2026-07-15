@@ -12,7 +12,7 @@ ALLOWED_ORIGIN = "*"
 # Fyll i id:t du får av kommandot:  wrangler kv namespace create TOKENS
 [[kv_namespaces]]
 binding = "TOKENS"
-id = "FYLL_I_HAR"
+id = "c9f5b47fa6b0421ea7cb6b2737b32f05"
 
 # Hemligheter sätts med:  wrangler secret put <NAMN>
 #   MS_CLIENT_ID      – Application (client) ID från Azure-appen
