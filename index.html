@@ -491,6 +491,27 @@
       letter-spacing: 0.8rem;
     }
 
+    /* ── Jump to photos ────────────────────────── */
+    .jump-to-photos {
+      display: none;
+      max-width: 320px;
+      margin: 0 auto 1.5rem;
+      padding: 0.9rem 1.5rem;
+      background: var(--gold);
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 30px;
+      font-family: 'Jost', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.03rem;
+      box-shadow: 0 6px 18px rgba(45,61,50,0.12);
+      transition: background 0.3s, transform 0.15s;
+    }
+
+    .jump-to-photos:hover  { background: #c9b28c; }
+    .jump-to-photos:active { transform: scale(0.97); }
+
     /* ── Photo section ─────────────────────────── */
     .photo-section {
       display: none;
@@ -747,6 +768,11 @@
       <div class="subtitle" data-i18n="subtitle">8 Augusti 2026 &nbsp;·&nbsp; Livesändning</div>
     </header>
 
+    <a href="#photo-section" class="jump-to-photos" id="jump-to-photos" data-i18n="jumpToPhotos"
+       onclick="event.preventDefault(); document.getElementById('photo-section').scrollIntoView({behavior:'smooth', block:'start'});">
+      📸 Ladda upp bilder — tryck här
+    </a>
+
     <div class="stream-section">
       <div class="stream-label" data-i18n="streamLabel">❀ &nbsp; Direktsändning &nbsp; ❀</div>
 
@@ -903,6 +929,7 @@
         subtitle: '8 Augusti 2026  ·  Livesändning',
         streamLabel: '❀   Direktsändning   ❀',
         placeholderText: 'Sändningen börjar snart',
+        jumpToPhotos: '📸 Ladda upp bilder — tryck här',
         photoLabel: '❀   Festbilder   ❀',
         photoIntro: 'Hjälp oss samla minnen från festen! Ta en bild eller välj ur galleriet — bilderna sparas direkt i vårt gemensamma album.',
         guestName: 'Ditt namn (frivilligt)',
@@ -933,6 +960,7 @@
         subtitle: '8 August 2026  ·  Live stream',
         streamLabel: '❀   Live broadcast   ❀',
         placeholderText: 'The broadcast will begin soon',
+        jumpToPhotos: '📸 Upload photos — tap here',
         photoLabel: '❀   Party photos   ❀',
         photoIntro: 'Help us collect memories from the party! Take a photo or choose from your gallery — the photos go straight into our shared album.',
         guestName: 'Your name (optional)',
@@ -1020,13 +1048,17 @@
     }
 
     // Auto-inloggning via QR-länk: ?p=<lösenord> hoppar över låsskärmen
+    // Extra: ?photo=1 scrollar direkt ner till fotouppladdningen (egen QR-kod för det)
+    let scrollToPhotosOnUnlock = false;
     (function () {
-      const p = new URLSearchParams(location.search).get('p');
+      const params = new URLSearchParams(location.search);
+      const p = params.get('p');
       if (p === ADMIN_PASSWORD) {
         isAdmin = true;
         unlock();
       } else if (p === GUEST_PASSWORD) {
         isAdmin = false;
+        if (params.get('photo') === '1') scrollToPhotosOnUnlock = true;
         unlock();
       }
     })();
@@ -1043,6 +1075,10 @@
           // Admin joins when they click Start, not immediately
         } else {
           initAgora(null);
+        }
+        if (scrollToPhotosOnUnlock) {
+          scrollToPhotosOnUnlock = false;
+          document.getElementById('photo-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 600);
     }
@@ -1250,13 +1286,16 @@
 
     function initPhotoSection() {
       const section = document.getElementById('photo-section');
+      const jump = document.getElementById('jump-to-photos');
       if (PHOTO_UPLOAD_URL) {
         section.style.display = 'block';
+        if (jump) jump.style.display = 'block';
         document.getElementById('photo-uploader').style.display = 'block';
         const saved = localStorage.getItem('guestName');
         if (saved) document.getElementById('guest-name').value = saved;
       } else if (ONEDRIVE_FALLBACK_URL) {
         section.style.display = 'block';
+        if (jump) jump.style.display = 'block';
         document.getElementById('photo-fallback').style.display = 'block';
         document.getElementById('photo-fallback-link').href = ONEDRIVE_FALLBACK_URL;
       }
