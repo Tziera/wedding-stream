@@ -40,23 +40,14 @@ kommer in sent fungerar det också; de ser sändningen från att de ansluter
 
 ---
 
-## Token — behövs det eller inte?
+## Token
 
-I admin-panelen finns ett fält för **token**. Om det behövs beror på hur
-Agora-projektet är inställt:
-
-- Är projektet i **testläge ("App ID only"/utan certifikat)** → lämna
-  fältet tomt. Enklast, och helt okej för ett bröllop.
-- Har projektet **App Certificate aktiverat** → då kräver Agora ett token.
-  Logga in på [console.agora.io](https://console.agora.io), gå till ditt
-  projekt → **Generate temp token**, ange kanalnamnet `brollop2026`,
-  och klistra in token i fältet innan du trycker "Starta sändning".
-  **OBS:** temp-tokens gäller max 24 timmar — generera det samma dag
-  som bröllopet, inte veckan innan!
-
-Kolla vilket läge projektet har: [console.agora.io](https://console.agora.io)
-→ Projects → titta på ditt projekt. Vet du inte — testa utan token först;
-får du token-fel vid start så säger felmeddelandet det.
+Projektet (App-ID `e0ad0c41fd9449c8a9447ba7013ecb0f`) är skapat **utan
+App Certificate**, så inget token behövs — varken för den som filmar eller
+för gästerna. Skapa aldrig ett certifikat på det här projektet i
+[console.agora.io](https://console.agora.io); Agora tillåter inte att man
+tar bort det igen, och gästernas anslutning (som aldrig skickar något
+token) skulle då sluta fungera.
 
 ---
 
@@ -88,9 +79,6 @@ Gör ett generalprov **dagen innan**, gärna på samma plats:
   inställningar (på iPhone: Inställningar → Safari → Kamera/Mikrofon).
 - **"Kameran används av en annan app"** — stäng andra appar som använder
   kameran och försök igen.
-- **Token-fel** — se token-avsnittet ovan; kontrollera att token är
-  nygenererat och för rätt kanal (`brollop2026`), eller lämna tomt om
-  projektet är i testläge.
 - **Gästerna ser bara "Sändningen börjar snart"** — sändningen är inte
   igång, eller så tappade filmartelefonen anslutningen. Starta om
   sändningen; be gästerna ladda om sidan om det inte hjälper.

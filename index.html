@@ -374,14 +374,6 @@
 
     .admin-input:focus { border-color: var(--sage); }
 
-    .admin-hint {
-      font-size: 0.68rem;
-      color: var(--text-light);
-      margin-top: -1rem;
-      margin-bottom: 1.25rem;
-      line-height: 1.5;
-    }
-
     /* Live badge */
     .live-badge {
       display: none;
@@ -795,14 +787,6 @@
       <div class="admin-panel" id="admin-panel">
         <h3>Hantera sändning</h3>
 
-        <!-- Optional token field -->
-        <input class="admin-input" type="text" id="token-input"
-          placeholder="Token (lämna tomt vid testning utan certifikat)"/>
-        <div class="admin-hint">
-          Behövs bara om Agora kräver det. Generera i så fall ett temporärt token
-          via Agora-konsolen och klistra in här innan du startar.
-        </div>
-
         <!-- Live badge -->
         <div class="live-badge" id="live-badge">
           <span class="live-dot"></span>
@@ -1074,7 +1058,7 @@
           document.getElementById('admin-panel').style.display = 'block';
           // Admin joins when they click Start, not immediately
         } else {
-          initAgora(null);
+          initAgora();
         }
         if (scrollToPhotosOnUnlock) {
           scrollToPhotosOnUnlock = false;
@@ -1084,7 +1068,7 @@
     }
 
     // ── Agora ─────────────────────────────────────
-    async function initAgora(token) {
+    async function initAgora() {
       AgoraRTC.setLogLevel(4);
       client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
 
@@ -1111,16 +1095,15 @@
         await client.setClientRole('audience', { level: 1 });
       }
 
-      await client.join(AGORA_APP_ID, AGORA_CHANNEL, token || null, null);
+      await client.join(AGORA_APP_ID, AGORA_CHANNEL, null, null);
     }
 
     async function startStream() {
-      const token = document.getElementById('token-input').value.trim() || null;
       setAdminStatus('connecting');
       clearError();
 
       try {
-        await initAgora(token);
+        await initAgora();
 
         if ('wakeLock' in navigator) {
           wakeLock = await navigator.wakeLock.request('screen');
@@ -1272,9 +1255,6 @@
       }
       if (e && e.code === 'NOT_READABLE') {
         return 'Kameran används av en annan app. Stäng den och försök igen.';
-      }
-      if (e && (e.code === 'INVALID_PARAMS' || e.message?.includes('token'))) {
-        return 'Token-fel. Kontrollera att token är korrekt, eller lämna fältet tomt om projektet inte kräver token.';
       }
       return 'Fel: ' + (e?.message || e?.code || JSON.stringify(e));
     }
