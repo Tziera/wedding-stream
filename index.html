@@ -1019,6 +1019,18 @@
       }
     }
 
+    // Auto-inloggning via QR-länk: ?p=<lösenord> hoppar över låsskärmen
+    (function () {
+      const p = new URLSearchParams(location.search).get('p');
+      if (p === ADMIN_PASSWORD) {
+        isAdmin = true;
+        unlock();
+      } else if (p === GUEST_PASSWORD) {
+        isAdmin = false;
+        unlock();
+      }
+    })();
+
     function unlock() {
       const lock = document.getElementById('lock-screen');
       lock.classList.add('fade-out');
