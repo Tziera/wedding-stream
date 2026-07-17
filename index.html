@@ -1246,6 +1246,10 @@
       if (document.getElementById('main-page').style.display !== 'block') return;
       if (isAdmin) {
         if (isStreaming && (!client || client.connectionState !== 'CONNECTED')) scheduleReconnect();
+        // Webbläsaren släpper wake locket automatiskt när fliken döljs — ta det på nytt.
+        if (isStreaming && !wakeLock && 'wakeLock' in navigator) {
+          navigator.wakeLock.request('screen').then(wl => { wakeLock = wl; }).catch(() => {});
+        }
       } else if (client && client.connectionState !== 'CONNECTED') {
         scheduleReconnect();
       }
