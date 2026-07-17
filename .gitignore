@@ -1,3 +1,4 @@
 # Wrangler / Cloudflare lokal cache
 worker/.wrangler/
+.wrangler/
 node_modules/
