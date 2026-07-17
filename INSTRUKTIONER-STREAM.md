@@ -31,7 +31,16 @@ Under sändningen finns tre knappar:
 - **Ljud av / Ljud på** — tystar mikrofonen tillfälligt.
 
 Skärmen hålls automatiskt vaken på filmarens telefon under sändningen
-(wake lock), men ha ändå laddaren i.
+(wake lock), men ha ändå laddaren i. **Viktigt:** wake lock hindrar bara
+telefonen från att somna av sig själv — trycker man på strömknappen låses
+skärmen ändå, det kan ingen webbsida hindra. Höj därför telefonens egen
+skärmtid-inställning inför bröllopet som extra säkerhet:
+- **iPhone:** Inställningar → Skärm och ljusstyrka → Automatisk låsning
+  → **Aldrig**.
+- **Android:** Inställningar → Skärm → Viloläge/Skärmtid → längsta
+  alternativet (ofta 30 min).
+
+Kom ihåg att ställa tillbaka det efteråt.
 
 Gästerna behöver inte göra något — sidan ansluter automatiskt när de
 loggat in, och videon dyker upp så fort sändningen startar. Om någon
