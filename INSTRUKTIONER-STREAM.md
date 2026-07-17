@@ -9,7 +9,7 @@ Sidan har två roller, som styrs av vilket lösenord man loggar in med
 | **Admin/filmare** | `admin8aug` | Samma sida + panelen "Hantera sändning" |
 
 Sändningen går via **Agora.io** — en streamingtjänst med gratisnivå.
-App-ID:t (`aaedf3f9538d4a5f91267c247ccad9ae`) och kanalnamnet
+App-ID:t (`e0ad0c41fd9449c8a9447ba7013ecb0f`) och kanalnamnet
 (`brollop2026`) ligger redan inlagda i `index.html`.
 
 ---
