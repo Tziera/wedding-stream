@@ -38,6 +38,13 @@ loggat in, och videon dyker upp så fort sändningen startar. Om någon
 kommer in sent fungerar det också; de ser sändningen från att de ansluter
 (det är en direktsändning, ingen inspelning).
 
+**Tappar man kontakten** (skärmlås, byte mellan WiFi/4G, appen hamnar i
+bakgrunden en stund) försöker både filmarens och gästernas sida återansluta
+automatiskt — en liten ruta med "Återansluter…" syns under tiden. Filmaren
+kan alltså gå iväg en stund och vara med på festen; sändningen fortsätter
+av sig själv när kontakten kommer tillbaka. Lyckas det inte automatiskt
+visas ett felmeddelande hos filmaren om att trycka "Starta sändning" igen.
+
 ---
 
 ## Token
