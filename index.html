@@ -339,6 +339,19 @@
       line-height: 1.5;
     }
 
+    .stream-reconnecting {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background: var(--sage-pale);
+      border: 1px solid var(--sage-light);
+      border-radius: 4px;
+      color: var(--sage-dark);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
     /* ── Admin panel ───────────────────────────── */
     .admin-panel {
       display: none;
@@ -783,6 +796,9 @@
       <!-- Error message -->
       <div class="stream-error" id="stream-error"></div>
 
+      <!-- Reconnecting message -->
+      <div class="stream-reconnecting" id="stream-reconnecting" data-i18n="reconnecting">Återansluter…</div>
+
       <!-- Admin panel -->
       <div class="admin-panel" id="admin-panel">
         <h3>Hantera sändning</h3>
@@ -931,6 +947,8 @@
         uploadFailed: 'Uppladdningen misslyckades',
         networkError: 'Nätverksfel — kontrollera uppkopplingen',
         unknownError: 'Okänt fel',
+        reconnecting: 'Återansluter…',
+        reconnectFailed: 'Anslutningen tappades och kunde inte återupprättas automatiskt. Tryck Starta sändning igen.',
         fullscreen: 'Helskärm',
         message: 'Vi är så glada att ni kan följa denna dag med oss,<br/>om än på håll. Ni är med oss i hjärtat.',
         footer: 'Johan Norberg &amp; Applepie Gamboa  ·  8 Augusti 2026'
@@ -962,6 +980,8 @@
         uploadFailed: 'Upload failed',
         networkError: 'Network error — check your connection',
         unknownError: 'Unknown error',
+        reconnecting: 'Reconnecting…',
+        reconnectFailed: 'The connection was lost and could not be restored automatically. Press Start streaming again.',
         fullscreen: 'Fullscreen',
         message: 'We are so happy that you can share this day with us,<br/>even from afar. You are with us in our hearts.',
         footer: 'Johan Norberg &amp; Applepie Gamboa  ·  8 August 2026'
@@ -1003,14 +1023,16 @@
       updatePhotoCount();
     }
 
-    let isAdmin      = false;
-    let client       = null;
-    let localAudio   = null;
-    let localVideo   = null;
-    let isStreaming  = false;
-    let isMuted      = false;
-    let backCamera   = true;
-    let wakeLock     = null;
+    let isAdmin         = false;
+    let client          = null;
+    let localAudio      = null;
+    let localVideo      = null;
+    let isStreaming     = false;
+    let isMuted         = false;
+    let backCamera      = true;
+    let wakeLock        = null;
+    let reconnecting    = false;
+    let intentionalLeave = false;
 
     // ── Password ──────────────────────────────────
     function checkPassword() {
@@ -1089,6 +1111,12 @@
 
       client.on('user-left', () => setStreamVisible(false));
 
+      client.on('connection-state-change', (curState) => {
+        if (curState === 'DISCONNECTED' && !intentionalLeave) {
+          scheduleReconnect();
+        }
+      });
+
       if (isAdmin) {
         await client.setClientRole('host');
       } else {
@@ -1133,6 +1161,7 @@
     }
 
     async function stopStream() {
+      intentionalLeave = true;
       try {
         if (localAudio) { localAudio.stop(); localAudio.close(); localAudio = null; }
         if (localVideo) { localVideo.stop(); localVideo.close(); localVideo = null; }
@@ -1143,7 +1172,84 @@
       isStreaming = false;
       setStreamVisible(false);
       setAdminStatus('idle');
+      intentionalLeave = false;
     }
+
+    // ── Automatisk återanslutning ─────────────────
+    // Om nätet tappas en stund (skärmlås, byte mellan WiFi/4G, appen i
+    // bakgrunden) märks det antingen via Agoras 'connection-state-change'
+    // eller när fliken blir synlig igen (se visibilitychange nedan).
+    function scheduleReconnect() {
+      if (reconnecting) return;
+      reconnecting = true;
+      showReconnecting(true);
+      const task = isAdmin ? reconnectAdmin() : reconnectGuest();
+      task.finally(() => {
+        reconnecting = false;
+        showReconnecting(false);
+      });
+    }
+
+    async function reconnectGuest() {
+      try {
+        if (client) {
+          intentionalLeave = true;
+          try { await client.leave(); } catch (e) {}
+          intentionalLeave = false;
+        }
+        client = null;
+        setStreamVisible(false);
+        await initAgora();
+      } catch (e) {
+        console.error('Återanslutning misslyckades', e);
+      }
+    }
+
+    async function reconnectAdmin() {
+      if (!isStreaming) return;
+      try {
+        if (localAudio) { try { localAudio.stop(); localAudio.close(); } catch (e) {} localAudio = null; }
+        if (localVideo) { try { localVideo.stop(); localVideo.close(); } catch (e) {} localVideo = null; }
+        if (client) {
+          intentionalLeave = true;
+          try { await client.leave(); } catch (e) {}
+          intentionalLeave = false;
+        }
+        client = null;
+
+        await initAgora();
+        localAudio = await AgoraRTC.createMicrophoneAudioTrack();
+        localVideo = await AgoraRTC.createCameraVideoTrack({
+          facingMode: backCamera ? 'environment' : 'user',
+          encoderConfig: '720p_1'
+        });
+        setStreamVisible(true);
+        localVideo.play('stream-video');
+        await client.publish([localAudio, localVideo]);
+      } catch (e) {
+        isStreaming = false;
+        client = null;
+        if (wakeLock) { wakeLock.release(); wakeLock = null; }
+        setStreamVisible(false);
+        setAdminStatus('idle');
+        showError(t('reconnectFailed'));
+        console.error(e);
+      }
+    }
+
+    function showReconnecting(visible) {
+      document.getElementById('stream-reconnecting').style.display = visible ? 'block' : 'none';
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (document.getElementById('main-page').style.display !== 'block') return;
+      if (isAdmin) {
+        if (isStreaming && (!client || client.connectionState !== 'CONNECTED')) scheduleReconnect();
+      } else if (client && client.connectionState !== 'CONNECTED') {
+        scheduleReconnect();
+      }
+    });
 
     async function flipCamera() {
       if (!isStreaming || !localVideo) return;
